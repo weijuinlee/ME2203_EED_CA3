@@ -1,0 +1,38 @@
+#include <SPI.h>//library to communicate with SPI devices
+#include <RF24.h>//library for NRF2401 communication
+RF24 radio(7, 8);// CE, CSN
+const byte rxAddr[6] = "00001";//create a byte array which will represent the address
+int sendingdata[6];
+const int xPin=2;
+const int yPin=3;
+
+void setup()
+{
+  Serial.begin(9600);
+  radio.begin();
+  radio.setPALevel(RF24_PA_MAX);
+  radio.setAutoAck(false);
+  radio.setRetries(15, 15);
+  radio.openWritingPipe(rxAddr);//set the same address on the receiver side
+  radio.stopListening(); //sets module as transmitter
+  delay(50);
+}
+
+void loop()
+{
+  int pulseX,pulseY;
+  int accelerationX,accelerationY;
+  pulseX=pulseIn(xPin,HIGH);
+  pulseY=pulseIn(yPin,HIGH);
+  accelerationX=(pulseX-5050);
+  accelerationY=(pulseY-5080);
+  Serial.print("Rolling:");
+  Serial.print(accelerationX);
+  Serial.println();
+  Serial.print("Pitching:");
+  Serial.print(accelerationY);
+  Serial.println();
+  sendingdata[0]=accelerationX;
+  sendingdata[1]=accelerationY;
+  radio.write( sendingdata, sizeof(sendingdata) );
+}
