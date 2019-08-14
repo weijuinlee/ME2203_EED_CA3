@@ -1,0 +1,100 @@
+#include <SPI.h>
+#include <RF24.h>
+#include <Servo.h>
+Servo myservo1;  // create servo object to control a servo1
+Servo myservo2;  // create servo object to control a servo2
+Servo myservo3;  // create servo object to control a servo3
+int pos = 0;    // variable to store the servo 
+RF24 radio(7, 8);
+const byte rxAddr[6] = "00001";
+int acceleration[6];
+int buttonPin = 5;
+
+void setup()
+{
+  for(int i = 2; i<=4; i++){
+    pinMode(i,OUTPUT);
+  }
+  while (!Serial);
+  Serial.begin(9600);
+  radio.begin();
+  radio.setPALevel(RF24_PA_MAX);
+  radio.setAutoAck(false);
+  radio.openReadingPipe(0, rxAddr);
+  radio.startListening();
+  myservo1.attach(9);  // attaches the servo on pin 9 to the servo1 object
+  myservo2.attach(10);  // attaches the servo on pin 10 to the servo2 object
+  myservo3.attach(6);  // attaches the servo on pin 6 to the servo3 object
+  pinMode(buttonPin, INPUT_PULLUP);
+}
+
+void loop()
+{
+  if (radio.available())
+  {
+    bool done = false;
+        while (!done)
+        { 
+        // Fetching the data payload
+        radio.read( acceleration, sizeof(acceleration) );
+        done = true;
+        int val0=map(acceleration[0],0,1024,0,180);
+        int val1=map(acceleration[1],0,1024,0,180);
+        if (val0<-135) {
+          myservo1.write(165);              // tell servo to go to position in variable 'pos'
+          delay(15);                       // waits 15ms for the servo to reach the position
+          if (val1<-110) {
+            myservo2.write(130);              // tell servo to go to position in variable 'pos'
+            delay(15);                       // waits 15ms for the servo to reach the position
+          }
+          else {
+            myservo2.write(95);              // tell servo to go to position in variable 'pos'
+            delay(15);                       // waits 15ms for the servo to reach the position
+          }
+        }                      
+        else if (val0>135)  {
+          myservo1.write(8);              // tell servo to go to position in variable 'pos'
+          delay(15);                       // waits 15ms for the servo to reach the position
+          if (val1<-110) {
+            myservo2.write(130);              // tell servo to go to position in variable 'pos'
+            delay(100);                       // waits 100ms for the servo to reach the position
+          }                      // waits 15ms for the servo to reach the position
+          else {
+            myservo2.write(95);              // tell servo to go to position in variable 'pos'
+            delay(15);                       // waits 100ms for the servo to reach the position
+          }
+        } 
+        else {
+          myservo1.write(85);              // tell servo to go to position in variable 'pos'
+          delay(15);                       // waits 15ms for the servo to reach the position
+          if (val1<-110) {
+            myservo2.write(130);              // tell servo to go to position in variable 'pos'
+            delay(100);                       // waits 100ms for the servo to reach the position
+          }                      
+          else {
+            myservo2.write(95);              // tell servo to go to position in variable 'pos'
+            delay(100);                       // waits 100ms for the servo to reach the position
+          }
+        }
+        //for serial observation
+        Serial.println("Roll");
+        Serial.println(val0);
+        Serial.println("Pitch");
+        Serial.println(val1);
+        }
+  }
+    else{
+      Serial.println("Data not received");
+    }
+   int buttonValue = digitalRead(buttonPin);
+   if (buttonValue == LOW){
+      myservo3.write(179);              // tell servo to go to position in variable 'pos'
+      delay(15);                       // waits 15ms for the servo to reach the position
+      Serial.println("Pushed");
+   } else {
+      myservo3.write(90);              // tell servo to go to position in variable 'pos'
+      delay(15);                       // waits 15ms for the servo to reach the position
+      Serial.println("Not pushed");
+   }
+  delay(50);
+}
