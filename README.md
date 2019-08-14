@@ -1,6 +1,6 @@
 # Singapore Polytechnic_ME2203_EED_CA3_armSTRONG
 
-Team Members: Lee Wei Juin,Diploma is Aerospace Electronics; Chew Liang Zhi,Diploma in Computer Engineering; Ang Kiat Wan Sorenson,Diploma in Aeronautical Engineering.
+Team Members: Lee Wei Juin,Diploma in Aerospace Electronics; Chew Liang Zhi,Diploma in Computer Engineering; Ang Kiat Wan Sorenson,Diploma in Aeronautical Engineering.
 
 DEMO VIDEO:https://www.youtube.com/watch?v=dD0ZOZnPKUM
 
